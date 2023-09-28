@@ -64,8 +64,8 @@ void loop() {
   logfile.print(myTime); logfile.print(", ");
   Serial.print(myTime); Serial.print(", ");
 
-  pir1status = digitalRead(pir1pin) // read PIR 1 status
-  pir2status = digitalRead(pir2pin) // read PIR 2 status
+  pir1status = digitalRead(pir1pin); // read PIR 1 status
+  pir2status = digitalRead(pir2pin); // read PIR 2 status
 
   // log PIR statuses to sd card and print to serial monitor
   logfile.print(pir1status); logfile.print(", ");
@@ -80,15 +80,15 @@ void loop() {
   digitalWrite(led2pin, (pir2status == HIGH ? HIGH : LOW));
 
   // initial stage both flags should be false. Waiting for either PIR 1 or 2 to be triggered
-  if ((!flag12 && !flag21) && (pir1Status || pir2Status)) {
+  if ((!flag12 && !flag21) && (pir1status || pir2status)) {
 
     // expecting pedestrian to walk from PIR 1 to 2 so turn on flag12
-    if (pir1Status) flag12 = true;
+    if (pir1status) flag12 = true;
     // get initial time
     initialTime = millis();
 
     // expecting pedestrian to walk from PIR 2 to 1 so turn on flag21
-    if (pir2Status) flag21 = true;
+    if (pir2status) flag21 = true;
     // get initial time
     initialTime = millis();
 
@@ -96,7 +96,7 @@ void loop() {
 
   // count for direction 1 to 2
   // wait for PIR 2 to become true and then get elapsed time and add to count
-  if (flag12 && !flag21 && pir2Status) {
+  if (flag12 && !flag21 && pir2status) {
     elapsedTime = millis() - initialTime;
     if (elapsedTime > 100) count12++; // only increment counter if >0.1s between two sensors
     // set both flags to true and wait for the PIR sensors to turn off before resetting flags to false
@@ -105,7 +105,7 @@ void loop() {
 
   // count for direction 2 to 1
   // wait for PIR 1 to become true and then get elapsed time and add to count
-  if (flag21 && !flag12 && pir1Status) {
+  if (flag21 && !flag12 && pir1status) {
     elapsedTime = millis() - initialTime;
     if (elapsedTime > 100) count21++; // only increment counter if >0.1s between two sensors
     // set both flags to true and wait for the PIR sensors to turn off before resetting flags to false
@@ -113,7 +113,7 @@ void loop() {
   
   }
   // flag reset if both flags have been tripped and sensors are free
-  if (flag12 && flag21 && !(pir1Status || pir2Status)) {
+  if (flag12 && flag21 && !(pir1status || pir2status)) {
     flag12 = false;
     flag21 = false;
   }
@@ -121,14 +121,14 @@ void loop() {
   // simple catch for waiting too long (>3s of only one sensor active)
   if (millis()-initialTime > 3000 && (flag12 ^ flag21)) {
     // wait for both sensors to turn off before resetting to avoid potential errors
-    if (!pir2Status && !pir1Status) {
+    if (!pir2status && !pir1status) {
       flag21 = false; flag12 = false;
     }
   }
 
 
   // log data to sd card and print to serial monitor
-
+  
 
 
   // create a new line for next time-step

@@ -132,8 +132,6 @@ void loop() {
   Serial.print(count12); Serial.print(", ");
   logfile.print(count21); logfile.print(", ");
   Serial.print(count21); Serial.print(", ");
-  logfile.print(count12); logfile.print(", ");
-  Serial.print(count12); Serial.print(", ");
   logfile.print(speed); logfile.print(", ");
   Serial.print(speed); Serial.print(", ");
 

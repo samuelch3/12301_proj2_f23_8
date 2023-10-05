@@ -1,14 +1,14 @@
 #include <SD.h>
 
-int led1pin;    // initializing LED indicating PIR 1
-int led2pin;    // initializing LED indicating PIR 2
+int led1pin = 3;    // initializing LED indicating PIR 1
+int led2pin = 2;    // initializing LED indicating PIR 2
 
-int pir1pin;          // Digital Pin
-int pir2pin;          // Digital Pin
+int pir1pin = 3;          // Digital Pin
+int pir2pin = 2;          // Digital Pin
 bool pir1status;      // SETTING THE STATUS OF PIR #1 TO A BOOLEAN DATA TYPE
 bool pir2status;      // SETTING THE STATUS OF PIR #2 TO A BOOLEAN DATA TYPE
 
-float distance;   // This is your distance in meters (ft. * 0.3)
+float distance = 0.13;   // This is your distance in meters (ft. * 0.3)
 
 int count12; // count for walking from PIR 1 to PIR 2
 int count21; // count for walking from PIR 2 to PIR 1
@@ -28,8 +28,13 @@ void setup() {
   Serial.begin(115200); // setup serial terminal
 
   // initialize PIR and LED
-  pinMode(led1pin, OUTPUT); pinMode(led2pin, OUTPUT);   // LEDs
+  // pinMode(led1pin, OUTPUT); pinMode(led2pin, OUTPUT);   // LEDs
   pinMode(pir1pin, INPUT); pinMode(pir2pin, INPUT);     // PIRs
+
+  count12 = 0;
+  count21 = 0;
+
+  flag12 = false; flag21 = false;
 
   delay(10000); // PIR needs to warm up. Wait at least 10 seconds before starting
 
@@ -42,14 +47,21 @@ void setup() {
     return;
   }
   Serial.println("card initialized.");
-  char filename[] = "path.csv"; // create a new file
 
+  // create a new file
+  char filename[] = "LOG00.csv";
+  for (uint8_t i = 0; i < 100; i++) {
+    filename[3] = i/10 + '0';
+    filename[4] = i%10 + '0';
+    if (!SD.exists(filename)) {
+      // open a new file when we find an unused filename
+      logfile = SD.open(filename, FILE_WRITE);
+      break; // stop searching for new filenames
+    }
+  }
   
   Serial.print("Logging to: ");
   Serial.println(filename);
-
-  // logfile.begin();
-  File logfile = SD.open(filename, FILE_WRITE);
 
   //HEADER 
   Serial.println("time, pir1, pir2, count 1 -> 2, count 2 -> 1, speed");
@@ -73,11 +85,7 @@ void loop() {
   Serial.print(pir1status); Serial.print(", ");
   Serial.print(pir2status); Serial.print(", ");  
 
-  // visual display showing PIR 1 is active with LED
-  digitalWrite(led1pin, (pir1status == HIGH ? HIGH : LOW));
-
-  // visual display showing PIR 2 is active with LED
-  digitalWrite(led2pin, (pir2status == HIGH ? HIGH : LOW));
+  // visual display showing PIRs are active with LED - REMOVED, LEDS HARDWIRED TO 
 
   // initial stage both flags should be false. Waiting for either PIR 1 or 2 to be triggered
   if ((!flag12 && !flag21) && (pir1status || pir2status)) {
@@ -127,7 +135,7 @@ void loop() {
   }
 
   // log data to sd card and print to serial monitor
-  float speed = distance / elapsedTime;
+  float speed = 1000 * distance / elapsedTime; // elapsedTime in ms, so we multiply by 1000 to get m/s
   logfile.print(count12); logfile.print(", ");
   Serial.print(count12); Serial.print(", ");
   logfile.print(count21); logfile.print(", ");

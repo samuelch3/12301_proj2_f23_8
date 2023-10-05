@@ -1,8 +1,5 @@
 #include <SD.h>
 
-int led1pin = 3;    // initializing LED indicating PIR 1
-int led2pin = 2;    // initializing LED indicating PIR 2
-
 int pir1pin = 3;          // Digital Pin
 int pir2pin = 2;          // Digital Pin
 bool pir1status;      // SETTING THE STATUS OF PIR #1 TO A BOOLEAN DATA TYPE
@@ -27,8 +24,7 @@ File logfile; // the logging file
 void setup() {
   Serial.begin(115200); // setup serial terminal
 
-  // initialize PIR and LED
-  // pinMode(led1pin, OUTPUT); pinMode(led2pin, OUTPUT);   // LEDs
+  // initialize PIR - No longer initializes LED, since LED hardwired to PIR
   pinMode(pir1pin, INPUT); pinMode(pir2pin, INPUT);     // PIRs
 
   count12 = 0;
@@ -85,7 +81,7 @@ void loop() {
   Serial.print(pir1status); Serial.print(", ");
   Serial.print(pir2status); Serial.print(", ");  
 
-  // visual display showing PIRs are active with LED - REMOVED, LEDS HARDWIRED TO 
+  // visual display showing PIRs are active with LED - REMOVED, LEDS HARDWIRED TO PIR
 
   // initial stage both flags should be false. Waiting for either PIR 1 or 2 to be triggered
   if ((!flag12 && !flag21) && (pir1status || pir2status)) {
